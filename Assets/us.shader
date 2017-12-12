@@ -32,6 +32,7 @@ Shader "Unlit/Wang/LigthModel"
 			{
 				float4 vertex : POSITION;
 				float2 uv : TEXCOORD0;
+				float4 time : POSITION;
 				float4 normal : NORMAL;
 			};
 
@@ -57,6 +58,8 @@ Shader "Unlit/Wang/LigthModel"
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 				o.worldNormal = mul(v.normal, (float3x3)unity_WorldToObject);
 				UNITY_TRANSFER_FOG(o,o.vertex);
+				float addPos = 0.5*(sin(_Time + (o.uv.y)) + 1);
+				o.vertex.x *= addPos;
 				return o;
 			}
 			
@@ -68,11 +71,11 @@ Shader "Unlit/Wang/LigthModel"
 				fixed3 worldNormal = normalize(i.worldNormal);
 				fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz);
 				UNITY_APPLY_FOG(i.fogCoord, col);
-				fixed4 Surface = col*_SurfaceColor*_SurfaceEX; //自发光颜色
-				fixed4 Ambient = col*_AmbientEX*_LightColor0.rgba; //环境光反射
+				//fixed4 Surface = col*_SurfaceColor*_SurfaceEX; //自发光颜色
+				//fixed4 Ambient = col*_AmbientEX*_LightColor0.rgba; //环境光反射
 				fixed4 Diffuse = col*_DiffuseEX*_LightColor0.rgba*saturate(dot(worldNormal, worldLightDir)); //漫反射
-				col = Surface + Ambient + Diffuse;// +Diffuse;
-
+				//col = Surface + Ambient + Diffuse;// +Diffuse;
+				col = Diffuse;
 
 				return col;
 			}
